@@ -183,3 +183,4 @@ TioricoController.getTransaction = (req, res) => {
             })
 }
 
+module.exports = TioricoController
