@@ -1,4 +1,78 @@
 
+const um = require('../models/tioricoModel'),
+    bcrypt = require('bcrypt'),
+    SALTROUNDS = 10,
+    { validationResult } = require('express-validator/check'),
+    https = require('https'),
+    querystring = require('querystring'),
+    axios = require('axios')
+
+TioricoController = {}
+
+TioricoController.register = (req,res) => {
+    let user = {
+        userName: req.body.userNick,
+        userPassword: req.body.userPassword,
+        userFirstName : req.body.userFirstName,
+        userLastName: req.body.userLastName,
+        idHouse: req.body.idHouse
+    },
+    errors = validationResult(req)
+    
+    return !errors.isEmpty()
+        ?   res.status(422).json({ errors: errors.array() })
+        :   bcrypt.genSalt(SALTROUNDS, (err,salt)=>{
+            if (err) { return res
+                .status(500)
+                .send({
+                    message: err.stack
+                }) 
+            }
+
+            bcrypt.hash(user.userPassword, salt, (err, hash) => {
+                user.userPassword = hash
+       
+                if (err) {
+                    return res
+                        .status(500)
+                        .send({
+                            message: err.stack
+                        })
+                }
+
+                um.userRegister(user)
+                    .then( data => {
+                        console.log(data)
+                        if (data[0]['response'] == -1) {
+                            return res
+                                .status(202)
+                                .send({
+                                    message: 'User already exist'
+                                })
+                        } else if (data[0]['response'] == 0) {
+                            return res
+                                .status(400)
+                                .send({
+                                    message: 'User created failed'
+                                })
+                        } else{
+                            return res
+                                .status(201)
+                                .send({
+                                    message: 'User created'
+                                })
+                        }
+                    }).catch( error => {
+                        return res
+                            .status(500)
+                            .send({
+                                message: error.stack
+                            })
+                    })
+                })
+            })
+}
+
 TioricoController.save = ( req, res) => {
     let transaction = {
         idUser: req.body.idUser,
