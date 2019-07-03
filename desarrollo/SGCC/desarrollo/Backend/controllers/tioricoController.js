@@ -1,3 +1,56 @@
+TioricoController.login = (req, res) => {
+    let user = {
+        userName: req.body.userNick,
+        userPassword: req.body.userPassword
+    },
+    errors = validationResult(req)
+    
+    return !errors.isEmpty()
+    ?   res.status(422).json({ errors: errors.array() })
+    :   um.userLogin(user)
+            .then( data => {
+                console.log(data[0])
+                if (data[0]==undefined) {
+                    return res
+                        .status(202)
+                        .send({
+                            message: 'User y/o password incorrect'
+                        })
+                } else {
+                    bcrypt.compare(user.userPassword, data[0].userpassword, function (error, response) {
+        
+                        if (error) {
+                            return res
+                                .status(500)
+                                .send({
+                                    message: error.stack
+                                })
+                        }
+                        if (response == true) {
+                            return res.status(200).send({
+                                message: 'Login succesfully',
+                                idUsuario : data[0].idUser,
+                                userName : data[0].userFirstName,
+                                userLastName: data[0].userLastName
+                            })
+                        } else {
+                            return res
+                                .status(202)
+                                .send({
+                                    message: 'User y/o password incorrect'
+                                })
+                        }
+                    })
+                }
+            })
+            .catch ( err=> {
+                return res
+                    .status(500)
+                    .send({
+                        message: err.stack
+                    })
+            })
+}
 
 TioricoController.save = ( req, res) => {
     let transaction = {

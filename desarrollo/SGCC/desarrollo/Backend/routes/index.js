@@ -1,3 +1,10 @@
+    /*
+        Post Login
+    */
+    .post( url.urlV1 + '/users/login', [
+    check('userNick').exists().isString(),
+    check('userPassword').exists().isString(),
+    ],TioRicoController.login)
 
     /*
         Post transaction
