@@ -1,4 +1,24 @@
 
+const express = require('express'),
+Router = express.Router(),
+{ url } = require('../config/config'),
+{ check } = require('express-validator/check'),
+{ checkSchema } = require('express-validator/check'),
+TioRicoController = require('../controllers/tioricoController')
+
+Router
+/*
+    Post SignIn
+*/
+.post( url.urlV1 + '/users/signin',[
+   check('userNick').exists().isString(),
+   check('userPassword').exists().isString(),
+   check('userFirstName').exists().isString(),
+   check('userLastName').exists().isString(),
+   check('idHouse').exists().isInt()
+], TioRicoController.register)
+
+
     /*
         Post transaction
     */
