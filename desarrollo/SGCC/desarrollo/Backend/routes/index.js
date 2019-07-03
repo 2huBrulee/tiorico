@@ -49,3 +49,7 @@ Router
         }),
         check('quantity').exists().isFloat(),
     ], TioRicoController.save)
+
+
+
+    module.exports = Router    
